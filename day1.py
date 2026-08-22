@@ -25,7 +25,7 @@ response = client.chat.completions.create(
     temperature= 0.1,
     messages= messages
 )
-assistant_response = response1.choices[0].message.content
+assistant_response = response.choices[0].message.content
 
 messages.append({
     "role": "assistant",
