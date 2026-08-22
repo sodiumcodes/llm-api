@@ -49,17 +49,18 @@ tools = [
         }
     }
 ]
+messages = [
+    {
+        "role": "user",
+        "content": "Get me the payment history of cust_123. Use the available tool."
+    },
+]
 response = client.chat.completions.create(
     model="openrouter/free",
     max_tokens=500,
     temperature=0.1,
     tools=tools,
-    messages=[
-        {
-            "role": "user",
-            "content": "Get me the payment history of cust_123. Use the available tool."
-        }
-    ]
+    messages=messages
 )
 message = response.choices[0].message
 tool_call = message.tool_calls[0]
@@ -69,20 +70,14 @@ customer_id = arguments["customer_id"]
 
 result = get_customer_retry_history(customer_id)
 
-messages = [
-    {
-        "role": "user",
-        "content": "Get me the payment history of cust_123. Use the available tool."
-    },
+messages.append(message),
     
-    message,
-    
-    {
+messages.append({
         "role": "tool",
         "tool_call_id": tool_call.id,
         "content": json.dumps(result)
-    }
-]
+    })
+
 
 final_response = client.chat.completions.create(
     model="openrouter/free",
