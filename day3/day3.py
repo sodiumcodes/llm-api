@@ -12,9 +12,9 @@ client = OpenAI(
     api_key = api_key
 )
 customer_data = {
-    "failed_attempts": 6,
+    "failed_attempts": 2,
     "successful_attempts": 10,
-    "last_retry_minutes_ago": 100,
+    "last_retry_minutes_ago": 20,
     "failure_reason": "network timeout"
 } 
 
@@ -69,6 +69,21 @@ arguments = json.loads(
     tool_call.function.arguments
 )
 decision = RecoveryDecision(**arguments)
+def check_policy(decision: RecoveryDecision, customer_data: dict):
+
+    if decision.action == "retry":
+
+        if customer_data["failed_attempts"] >= 5:
+            return False, "Maximum retry attempts reached"
+
+        if decision.retry_after_minutes < 30:
+            return False, "Retry delay must be at least 30 minutes"
+
+        if decision.confidence < 0.7:
+            return False, "Confidence is too low for automatic retry"
+
+    return True, "Decision approved"
+
 def execute_recovery_decision(decision: RecoveryDecision):
 
     if decision.action == "retry":
@@ -91,4 +106,13 @@ def execute_recovery_decision(decision: RecoveryDecision):
         print(
             "Stopping further recovery attempts"
         )
-execute_recovery_decision(decision)
+
+is_allowed, response = check_policy(
+    decision,
+    customer_data
+)
+print(response)
+if is_allowed:
+    execute_recovery_decision(decision)
+else :
+    print("Blocked by policy.\n")
