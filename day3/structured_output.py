@@ -1,6 +1,7 @@
 from pydantic import BaseModel , Field, model_validator
 from typing import Literal
 import json
+
 class RecoveryDecision(BaseModel):
     action: Literal["retry", "notify", "escalate", "stop"]
     retry_after_minutes: int | None = Field(
@@ -30,19 +31,18 @@ class RecoveryDecision(BaseModel):
 
         return self
 
-decision = RecoveryDecision(
-    action="retry",
-    reason="The failure appears temporary and the customer has sufficient retry attempts remaining.",
-    retry_after_minutes=30,
-    confidence=0.91
-)
-d= RecoveryDecision (
-    action="notify",
-    reason="Temporary failure detected",
-    retry_after_minutes=None,
-    confidence=0.9
-)
-
+# decision = RecoveryDecision(
+#     action="retry",
+#     reason="The failure appears temporary and the customer has sufficient retry attempts remaining.",
+#     retry_after_minutes=30,
+#     confidence=0.91
+# )
+# d= RecoveryDecision (
+#     action="notify",
+#     reason="Temporary failure detected",
+#     retry_after_minutes=None,
+#     confidence=0.9
+# )
 
 decision_schema = RecoveryDecision.model_json_schema()
 
