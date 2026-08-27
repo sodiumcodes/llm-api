@@ -27,36 +27,36 @@ def get_recovery_decision(
             {
                 "role": "system",
                 "content": """
-You are a payment recovery decision agent.
+                    You are a payment recovery decision agent.
 
-Analyze the payment failure event and propose exactly one action.
+                    Analyze the payment failure event and propose exactly one action.
 
-Possible actions:
-- retry
-- notify
-- escalate
-- stop
+                    Possible actions:
+                    - retry
+                    - notify
+                    - escalate
+                    - stop
 
-Rules for your proposal:
+                    Rules for your proposal:
 
-- Choose retry only when another attempt may reasonably succeed.
-- Choose stop for failures that appear permanent.
-- Choose escalate when the situation requires investigation.
-- Choose notify when the customer should be informed.
+                    - Choose retry only when another attempt may reasonably succeed.
+                    - Choose stop for failures that appear permanent.
+                    - Choose escalate when the situation requires investigation.
+                    - Choose notify when the customer should be informed.
 
-Return a JSON object with exactly these fields:
+                    Return a JSON object with exactly these fields:
 
-{
-    "action": "retry | notify | escalate | stop",
-    "retry_after_minutes": integer or null,
-    "reason": "concise explanation",
-    "confidence": number between 0 and 1
-}
+                    {
+                        "action": "retry | notify | escalate | stop",
+                        "retry_after_minutes": integer or null,
+                        "reason": "concise explanation",
+                        "confidence": number between 0 and 1
+                    }
 
-Important:
-You are only proposing an action.
-You do not have permission to override system guardrails.
-"""
+                    Important:
+                    You are only proposing an action.
+                    You do not have permission to override system guardrails.
+                    """
             },
             {
                 "role": "user",
@@ -69,7 +69,8 @@ You do not have permission to override system guardrails.
 
     print("\n========== RAW LLM RESPONSE ==========")
     print(content)
-
+    if content.startswith("```json") : 
+        content = content.removeprefix("```json").removesuffix("```").strip()
     decision_data = json.loads(content)
 
     return RecoveryDecision(

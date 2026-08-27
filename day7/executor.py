@@ -19,7 +19,7 @@ def execute_permitted_action(
     # 2. HUMAN REVIEW
     # =================================
 
-    elif result.require_human_review:
+    if result.require_human_review:
         return ExecutionResult(
             action=result.final_action,
             executed=False,
@@ -33,6 +33,14 @@ def execute_permitted_action(
     # =================================
     # 3. EXECUTION
     # =================================
+
+    if result.final_action == "escalate":
+        return ExecutionResult(
+            action="escalate",
+            executed=True,
+            status="executed",
+            message="Escalation executed successfully."
+        )
 
     elif result.final_action == "retry":
         return ExecutionResult(
@@ -50,15 +58,10 @@ def execute_permitted_action(
             message="Notification sent successfully."
         )
 
-    elif result.final_action == "escalate":
-        return ExecutionResult(
-            action="escalate",
-            executed=True,
-            status="executed",
-            message="Escalation executed successfully."
-        )
+    # =================================
+    # FALLBACK
+    # =================================
 
-    # Fallback
     return ExecutionResult(
         action="stop",
         executed=False,
